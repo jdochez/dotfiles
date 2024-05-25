@@ -282,9 +282,15 @@ function bazel_unit_tests {
 function build_studio {
 bazel build //tools/adt/idea/studio:android-studio
 pushd $HOME/tools
-rm -rf "Android Studio Preview.app"
+if [ $OS_NAME = "darwin" ]
+then
+  export STUDIO_DIR_NAME="Android Studio Preview.app"
+else 
+  export STUDIO_DIR_NAME="android-studio"
+fi
+rm -rf $STUDIO_DIR_NAME
 unzip -q $WORKSPACE_LOCATION/bazel-bin/tools/adt/idea/studio/android-studio.$OS_LABEL.zip
-echo "Android Studio ready at $HOME/tools/Android Studio Preview.app"
+echo "Android Studio ready at $HOME/tools/$STUDIO_DIR_NAME"
 popd
 }
 
@@ -370,6 +376,7 @@ then
   function setzoom() {
     gsettings set org.gnome.desktop.interface text-scaling-factor "$@";
   }
+  alias bat='batcat'
 fi
 if [ $OS_NAME = "darwin" ]
 then
