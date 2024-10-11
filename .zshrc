@@ -426,3 +426,4 @@ then
   add-zsh-hook preexec fixup_ssh_auth_sock
 fi
 
+export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket" 

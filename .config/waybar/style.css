@@ -1,0 +1,16 @@
+@import "macchiato.css";
+
+* {
+  /* reference the color by using @color-name */
+  color: @text;
+}
+
+* {
+    font-family: 'Google Sans';
+} 
+
+window#waybar {
+  /* you can also GTK3 CSS functions! */
+  background-color: shade(@base, 0.9);
+  border: 2px solid alpha(@crust, 0.3);
+}
