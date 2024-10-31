@@ -1,0 +1,44 @@
+(
+    defwindow audio_menu
+    :monitor 0
+    :exclusive "false"
+    :stacking "overlay"
+    :geometry
+    (geometry :anchor "center")
+    (audio_menu)
+)
+
+(
+    defwidget audio_menu []
+    (
+        box :class "parent" :space-evenly "false" :orientation "v"
+        (
+            box :class "header" :space-evenly "false"
+            (label :text "    Switch Audio Devices" :class "title")
+            (
+                button 
+                :class "exit" 
+                :onclick "/usr/local/google/home/jedo/tools/eww/target/release/eww close audio_menu"
+                (label :text "✖")
+            )
+        )
+        (
+            box :class "body" :space-evenly "false" :orientation "v"
+            (
+                button 
+                :class "button"
+                :vexpand "false"
+                :onclick "/usr/local/google/home/jedo/bin/set_audio.sh alsa_output.usb-Generic_Realtek_USB_Audio_Front-00.HiFi__hw_Main__sink"
+                (label :text "🔊 Speakers")
+            )
+            (
+                button 
+                :class "button"
+                :hexpand "false"
+                :onclick "/usr/local/google/home/jedo/bin/set_audio.sh bluez_output.7C_96_D2_BE_7A_4D.1"
+                (label :text " Bluetooth")
+            )
+        )
+    )
+)
+

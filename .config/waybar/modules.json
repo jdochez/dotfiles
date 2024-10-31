@@ -74,13 +74,13 @@
 
     // CPU
     "cpu": {
-        "format": " {usage}% ",
+        "format": "💻 {usage}% ",
         "on-click": "kitty -e htop"
     },
 
     // Memory
     "memory": {
-        "format": "/ M {}% ",
+        "format": "🐏 {}% ",
         "on-click": "kitty -e htop"
     },
 
@@ -161,7 +161,8 @@
             "car": "",
             "default": ["", " ", " "]
         },
-        "on-click": "pavucontrol"
+        "on-click": "pavucontrol",
+        "on-click-right": "~/tools/eww/target/release/eww open audio_menu --toggle"
     },
 
     // Bluetooth

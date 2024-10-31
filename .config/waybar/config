@@ -32,7 +32,6 @@
     "modules-right": [
         "mpd", 
         "pulseaudio", 
-        "network", 
         "cpu", 
         "memory", 
         "tray",
