@@ -74,13 +74,13 @@
 
     // CPU
     "cpu": {
-        "format": " {usage}% ",
+        "format": "💻 {usage}% ",
         "on-click": "kitty -e htop"
     },
 
     // Memory
     "memory": {
-        "format": "/ M {}% ",
+        "format": "🐏 {}% ",
         "on-click": "kitty -e htop"
     },
 
@@ -161,7 +161,8 @@
             "car": "",
             "default": ["", " ", " "]
         },
-        "on-click": "pavucontrol"
+        "on-click": "pavucontrol",
+        "on-click-right": "~/tools/eww/target/release/eww open audio_menu --toggle"
     },
 
     // Bluetooth
@@ -193,16 +194,16 @@
     "custom/weather": {
         "format": "{}",
         "interval": 3600,
-        "exec": "curl -s 'https://wttr.in/mercer-island?2mn&format=2'",
+        "exec": "curl -s 'https://wttr.in/kirkland?2mn&format=2'",
         "exec-if": "ping wttr.in -c1"
     },
     "custom/stock-ticker-goog": {
-        "exec": "/home/jedo/tools/waybar-stock-ticker/stock.sh GOOG",
+        "exec": "~/tools/waybar-stock-ticker/stock.sh GOOG",
         "on-click": "/home/jedo/tools/waybar-stock-ticker/notify-stock.sh GOOG",
         "restart-interval": 10
     },
     "custom/stock-ticker-aapl": {
-        "exec": "/home/jedo/tools/waybar-stock-ticker/stock.sh AAPL",
+        "exec": "~/tools/waybar-stock-ticker/stock.sh AAPL",
         "on-click": "/home/jedo/tools/waybar-stock-ticker/notify-stock.sh AAPL",
         "restart-interval": 10
     },
