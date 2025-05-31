@@ -4,6 +4,8 @@ if [ $OS_NAME = "darwin" ]
 then
   export JAVA_HOME=$HOME/src/studio-main/prebuilts/studio/jdk/jdk17/mac-arm64/Contents/Home
   export OS_LABEL="mac_arm"
+  autoload -Uz compinit
+  compinit
 else
   export JAVA_HOME=$HOME/src/studio-main/prebuilts/studio/jdk/jdk17/$OS_NAME
   export OS_LABEL=$OS_NAME
@@ -82,7 +84,25 @@ ZSH_THEME="agnoster"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git z colored-man-pages gradle repo colorize zsh-autosuggestions zsh-syntax-highlighting bgnotify dirhistory)
 
-source $ZSH/oh-my-zsh.sh
+
+source ~/.zsh/zsh-you-should-use/you-should-use.plugin.zsh
+source ~/.zsh/zsh-bat/zsh-bat.plugin.zsh
+source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source ~/.zsh/ohmyzsh/plugins/colorize/colorize.plugin.zsh
+source ~/.zsh/ohmyzsh/plugins/git/git.plugin.zsh
+source ~/.zsh/ohmyzsh/plugins/z/z.plugin.zsh
+source ~/.zsh/ohmyzsh/plugins/gradle/gradle.plugin.zsh
+source ~/.zsh/ohmyzsh/plugins/repo/repo.plugin.zsh
+source ~/.zsh/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh
+source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
+
+# load fzf keybindings and completions
+eval "$(fzf --zsh)"
+
+# start Starship prompt
+eval "$(starship init zsh)"
+#source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
@@ -113,6 +133,36 @@ source $ZSH/oh-my-zsh.sh
 alias python="python3"
 alias vi="nvim"
 
+#
+# key bindings
+#
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+
+#
+# fzf-tab configuration
+#
+# disable sort when completing `git checkout`
+zstyle ':completion:*:git-checkout:*' sort false
+# set descriptions format to enable group support
+# NOTE: don't use escape sequences (like '%F{red}%d%f') here, fzf-tab will ignore them
+zstyle ':completion:*:descriptions' format '[%d]'
+# set list-colors to enable filename colorizing
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+# force zsh not to show completion menu, which allows fzf-tab to capture the unambiguous prefix
+zstyle ':completion:*' menu no
+# preview directory's content with eza when completing cd
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+# custom fzf flags
+# NOTE: fzf-tab does not follow FZF_DEFAULT_OPTS by default
+zstyle ':fzf-tab:*' fzf-flags --color=fg:1,fg+:2 --bind=tab:accept
+# To make fzf-tab follow FZF_DEFAULT_OPTS.
+# NOTE: This may lead to unexpected behavior since some flags break this plugin. See Aloxaf/fzf-tab#455.
+zstyle ':fzf-tab:*' use-fzf-default-opts yes
+# switch group using `<` and `>`
+zstyle ':fzf-tab:*' switch-group '<' '>'
+
+
 prompt_context() {
   if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
 #    prompt_segment black default "%(!.%{%F{yellow}%}.)$USER"
@@ -125,7 +175,7 @@ prompt_context() {
 # export GDK_DPI_SCALE=1
 # export QT_AUTO_SCREEN_SCALE_FACTOR=1
 
-# 
+#
 # NNN plugins
 #
 export NNN_FIFO=/tmp/nnn.fifo
@@ -145,7 +195,7 @@ fi
 #
 # V A R I O U S   CLI UTILS
 #
-eval $(thefuck --alias fix) 
+eval $(thefuck --alias fix)
 
 #
 # G E N E R A L related functions
@@ -166,7 +216,7 @@ fi
 
 #
 # AGP Related functions
-# 
+#
 function build_test {
    $WORKSPACE_LOCATION/tools/gradlew $*
 }
@@ -254,7 +304,7 @@ function gat {
 # B A Z E L related functions.
 #
 function bct {
-	bazel test //tools/base/build-system/gradle-core:tests
+bazel test //tools/base/build-system/gradle-core:tests
 }
 
 function bazel_databinding_tests {
@@ -320,7 +370,7 @@ chmod a+x ~/bin/bazel
 }
 
 function create_branch {
-  if [ $# -eq 0 ] 
+  if [ $# -eq 0 ]
   then
     echo "error: branch name not provided"
     exit 1
@@ -375,11 +425,6 @@ if [ $OS_NAME = "linux" ]
 then
   echo Welcome to `hostname` gLinux `whoami`
   alias linux_config='/usr/bin/git --git-dir=$HOME/src/linux_cfg/ --work-tree=$HOME'
-
-  source /etc/bash_completion.d/hgd
-  function setzoom() {
-    gsettings set org.gnome.desktop.interface text-scaling-factor "$@";
-  }
   alias bat='batcat'
 fi
 if [ $OS_NAME = "darwin" ]
@@ -412,22 +457,3 @@ if [ -f '/Users/jedo/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/jedo/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/jedo/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
-
-# Fix ssh-agent issues with remoting
-fixup_ssh_auth_sock() {
-  if [[ -n ${SSH_AUTH_SOCK} && ! -e ${SSH_AUTH_SOCK} ]]
-  then
-    local new_sock=$(echo /tmp/ssh-*/agent.*(=UNom[1]))
-     if [[ -n ${new_sock} ]]
-     then
-       export SSH_AUTH_SOCK=${new_sock}
-     fi
-  fi
-}
-if [[ -n ${SSH_AUTH_SOCK} ]]
-then
-  autoload -U add-zsh-hook
-  add-zsh-hook preexec fixup_ssh_auth_sock
-fi
-
-export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/ssh-agent.socket" 
