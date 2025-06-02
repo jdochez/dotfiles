@@ -125,3 +125,11 @@ button:hover {
     padding-left: 6px;
     padding-right: 6px;
 }
+#custom-notification {
+  padding-left: 6px;
+  padding-right: 6px;
+}
+#custom-exit {
+  padding-left: 6px;
+  padding-right: 6px;
+}

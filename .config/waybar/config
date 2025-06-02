@@ -3,10 +3,10 @@
     
     // "position": "bottom", // Waybar position (top|bottom|left|right)
     
-    "height": 30, // Waybar height (to be removed for auto height)
+    "height": 20, // Waybar height (to be removed for auto height)
     // "width": 1280, // Waybar width
     
-    "spacing": 4, // Gaps between modules (4px)
+    "spacing": 8, // Gaps between modules (4px)
     // Choose the order of the modules
 
     // Load Modules
@@ -27,7 +27,10 @@
     "modules-center": [
         "clock",
         "custom/separator",
-        "hyprland/workspaces",
+        "sway/workspaces",
+        "sway/window",
+        "sway/mode",
+        "sway/scratchpad", 
     ],
     "modules-right": [
         "mpd", 
@@ -35,6 +38,11 @@
         "cpu", 
         "memory", 
         "tray",
-        "custom/exit"
+        "bluetooth",
+        "custom/separator",
+        "custom/notification",
+        "custom/separator",
+        "custom/exit",
+        "custom/separator",
     ]
 }

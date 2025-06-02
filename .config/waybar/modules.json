@@ -47,9 +47,9 @@
     
     // Power Menu
     "custom/exit": {
-        "format": "",
+        "format": "⏻",
         "tooltip-format": "Powermenu",
-        "on-click": "wlogout -b 4",
+        "on-click": "nwg-bar",
         "tooltip": false
     },
 
@@ -61,9 +61,17 @@
 
     // Clock
     "clock": {
-        // "timezone": "America/Los_Angeles",
+        "timezone": "America/Los_Angeles",
+        "timezones": ["America/Los_Angeles", "CST", "CEST", "Asia/Kolkata" ],  
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><big>{calendar}</big></tt>",
-        "format-alt": "{:%Y-%m-%d}"
+        "format-alt": "{:%Y-%m-%d}",
+        "actions": {
+	       	"on-click-right": "mode",
+		      "on-click-forward": "tz_up",
+		      "on-click-backward": "tz_down",
+		      "on-scroll-up": "shift_up",
+		      "on-scroll-down": "shift_down"
+	    }
     },
 
     // System
@@ -212,4 +220,24 @@
         "interval": "once",
         "tooltip": false
     },
+    "custom/notification": {
+      "tooltip": false,
+      "format": "{icon}",
+      "format-icons": {
+        "notification": "<span foreground='red'><sup></sup></span>",
+        "none": "",
+        "dnd-notification": "<span foreground='red'><sup></sup></span>",
+        "dnd-none": "",
+        "inhibited-notification": "<span foreground='red'><sup></sup></span>",
+        "inhibited-none": "",
+        "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
+        "dnd-inhibited-none": ""
+      },
+      "return-type": "json",
+      "exec-if": "which swaync-client",
+      "exec": "swaync-client -swb",
+      "on-click": "swaync-client -t -sw",
+      "on-click-right": "swaync-client -d -sw",
+      "escape": true
+  },
 }

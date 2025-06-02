@@ -85,8 +85,14 @@ ZSH_THEME="agnoster"
 plugins=(git z colored-man-pages gradle repo colorize zsh-autosuggestions zsh-syntax-highlighting bgnotify dirhistory)
 
 
-source ~/.zsh/zsh-you-should-use/you-should-use.plugin.zsh
-source ~/.zsh/zsh-bat/zsh-bat.plugin.zsh
+
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=1000
+setopt SHARE_HISTORY
+
+
+
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source ~/.zsh/ohmyzsh/plugins/colorize/colorize.plugin.zsh
@@ -94,6 +100,9 @@ source ~/.zsh/ohmyzsh/plugins/git/git.plugin.zsh
 source ~/.zsh/ohmyzsh/plugins/z/z.plugin.zsh
 source ~/.zsh/ohmyzsh/plugins/gradle/gradle.plugin.zsh
 source ~/.zsh/ohmyzsh/plugins/repo/repo.plugin.zsh
+source ~/.zsh/ohmyzsh/plugins/dirhistory/dirhistory.plugin.zsh
+source ~/.zsh/zsh-you-should-use/you-should-use.plugin.zsh
+source ~/.zsh/zsh-bat/zsh-bat.plugin.zsh
 source ~/.zsh/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh
 source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
 
@@ -102,7 +111,9 @@ eval "$(fzf --zsh)"
 
 # start Starship prompt
 eval "$(starship init zsh)"
-#source $ZSH/oh-my-zsh.sh
+
+
+
 
 # User configuration
 
@@ -132,6 +143,10 @@ eval "$(starship init zsh)"
 #
 alias python="python3"
 alias vi="nvim"
+alias ls='ls --color'
+alias venv='python -m venv'
+alias pip='python -m pip'
+alias hg='kitten hyperlinked-grep'
 
 #
 # key bindings
@@ -457,3 +472,10 @@ if [ -f '/Users/jedo/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/jedo/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/jedo/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+
+function restart_agent() {
+   ssh-agent -k
+   mkdir -p ${SSH_AUTH_SOCK%/*}
+   eval $(ssh-agent -a "${SSH_AUTH_SOCK}")
+}
+
