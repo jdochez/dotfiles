@@ -113,7 +113,10 @@ eval "$(fzf --zsh)"
 eval "$(starship init zsh)"
 
 
-
+# Load personal secrets if the file exists.
+if [[ -a ~/.zsh_secrets ]]; then
+  source ~/.zsh_secrets
+fi
 
 # User configuration
 
@@ -147,6 +150,7 @@ alias ls='ls --color'
 alias venv='python -m venv'
 alias pip='python -m pip'
 alias hg='kitten hyperlinked-grep'
+alias ls="ls --color"
 
 #
 # key bindings
