@@ -150,7 +150,11 @@ alias ls='ls --color'
 alias venv='python -m venv'
 alias pip='python -m pip'
 alias hg='kitten hyperlinked-grep'
+<<<<<<< Updated upstream
 alias ls="ls --color"
+=======
+alias sudo='env -u TERMINFO sudo'
+>>>>>>> Stashed changes
 
 #
 # key bindings
@@ -347,6 +351,10 @@ function bazel_integ_tests {
 function bazel_unit_tests {
   bazel test -- //tools/base/build-system/... -//tools/base/build-system/integration-test/...
   notify-send "Bazel unit tests finished"
+}
+
+function aswb() {
+  bazel run //tools/vendor/google/aswb  
 }
 
 #
