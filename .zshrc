@@ -9,6 +9,8 @@ then
 else
   export JAVA_HOME=$HOME/src/studio-main/prebuilts/studio/jdk/jdk17/$OS_NAME
   export OS_LABEL=$OS_NAME
+  alias sudo='env -u TERMINFO sudo'
+
 fi
 export PATH=$HOME/bin:$JAVA_HOME/bin:$PATH:/opt/homebrew/bin:$HOME/.cargo/bin:$HOME/tools/cli/diff-so-fancy
 
@@ -102,7 +104,7 @@ source ~/.zsh/ohmyzsh/plugins/gradle/gradle.plugin.zsh
 source ~/.zsh/ohmyzsh/plugins/repo/repo.plugin.zsh
 source ~/.zsh/ohmyzsh/plugins/dirhistory/dirhistory.plugin.zsh
 source ~/.zsh/zsh-you-should-use/you-should-use.plugin.zsh
-source ~/.zsh/zsh-bat/zsh-bat.plugin.zsh
+# source ~/.zsh/zsh-bat/zsh-bat.plugin.zsh
 source ~/.zsh/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh
 source ~/.zsh/fzf-tab/fzf-tab.plugin.zsh
 
@@ -150,11 +152,7 @@ alias ls='ls --color'
 alias venv='python -m venv'
 alias pip='python -m pip'
 alias hg='kitten hyperlinked-grep'
-<<<<<<< Updated upstream
 alias ls="ls --color"
-=======
-alias sudo='env -u TERMINFO sudo'
->>>>>>> Stashed changes
 
 #
 # key bindings
