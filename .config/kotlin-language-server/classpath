@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# If this root is a native Gradle or Maven project, let KLS use its built-in resolvers.
+for marker in settings.gradle settings.gradle.kts build.gradle build.gradle.kts pom.xml; do
+  if [[ -f "$PWD/$marker" ]]; then
+    exit 0
+  fi
+done
+
+# Find Bazel workspace root by walking up from $PWD
+find_bazel_root() {
+  local dir="$1"
+  while [[ "$dir" != "/" ]]; do
+    if [[ -f "$dir/MODULE.bazel" || -f "$dir/WORKSPACE.bazel" || -f "$dir/WORKSPACE" ]]; then
+      echo "$dir"
+      return 0
+    fi
+    dir="$(dirname "$dir")"
+  done
+  return 1
+}
+
+BAZEL_ROOT="$(find_bazel_root "$PWD" || true)"
+if [[ -z "$BAZEL_ROOT" ]]; then
+  exit 0
+fi
+
+REL_PKG="${PWD#"$BAZEL_ROOT"}"
+REL_PKG="${REL_PKG#/}"
+if [[ -n "$REL_PKG" ]]; then
+  TARGET="//${REL_PKG}/..."
+else
+  TARGET="//..."
+fi
+
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/kotlin-language-server"
+mkdir -p "$CACHE_DIR"
+CACHE_KEY="$(echo -n "$PWD" | sha256sum | cut -d' ' -f1)"
+CACHE_FILE="$CACHE_DIR/${CACHE_KEY}.classpath"
+
+generate_classpath() {
+  local exec_root
+  exec_root="$(bazel info execution_root 2>/dev/null)" || return 1
+  local bazel_bin="$BAZEL_ROOT/bazel-bin"
+
+  local jars=()
+  while IFS= read -r rel_path; do
+    [[ -z "$rel_path" ]] && continue
+    # Skip exec-transition duplicates, .lib.jar duplicates, test jars, and conflicting kotlin-stdlib/compiler jars
+    if [[ "$rel_path" == bazel-out/*-exec/* || "$rel_path" == *.lib.jar || "$rel_path" == *-test.jar || "$rel_path" == *-tests.jar || "$rel_path" == *kotlin-stdlib* || "$rel_path" == *kotlin-compiler* ]]; then
+      continue
+    fi
+    # Exclude jars produced by the current Bazel package itself (since KLS compiles its .kt sources directly),
+    # except shaded third-party jars or pure-Java/proto jars in a package with no .kt sources.
+    if [[ -n "$REL_PKG" && "$rel_path" == bazel-out/*/bin/"$REL_PKG"/* && "$rel_path" != *shaded*.jar ]]; then
+      if [[ -n "$(find "$PWD" -name "*.kt" -print -quit 2>/dev/null)" ]]; then
+        continue
+      fi
+    fi
+    if [[ -f "$exec_root/$rel_path" ]]; then
+      jars+=("$exec_root/$rel_path")
+    elif [[ "$rel_path" == bazel-out/*/bin/* ]]; then
+      local bin_rel="${rel_path#bazel-out/*/bin/}"
+      if [[ -f "$bazel_bin/$bin_rel" ]]; then
+        jars+=("$bazel_bin/$bin_rel")
+      fi
+    fi
+  done < <(
+    bazel cquery "kind(\".*import|.*library\", deps($TARGET))" \
+      --output=starlark \
+      --starlark:expr='"\n".join([f.path for f in target.files.to_list() if f.path.endswith(".jar") and not f.path.endswith(".src.jar") and not f.path.endswith("-sources.jar")])' \
+      2>/dev/null | sort -u
+  )
+
+  if [[ ${#jars[@]} -gt 0 ]]; then
+    local IFS=":"
+    echo "${jars[*]}" > "${CACHE_FILE}.tmp"
+    mv "${CACHE_FILE}.tmp" "$CACHE_FILE"
+  fi
+}
+
+# If we already have a cached classpath, emit it immediately and refresh in background if BUILD files changed
+if [[ -s "$CACHE_FILE" ]]; then
+  cat "$CACHE_FILE"
+  if [[ -n "$(find "$PWD" -maxdepth 2 \( -name "BUILD" -o -name "BUILD.bazel" \) -newer "$CACHE_FILE" -print -quit 2>/dev/null)" ]]; then
+    (generate_classpath >/dev/null 2>&1 &)
+  fi
+  exit 0
+fi
+
+generate_classpath
+if [[ -s "$CACHE_FILE" ]]; then
+  cat "$CACHE_FILE"
+fi
