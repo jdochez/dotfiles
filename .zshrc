@@ -153,6 +153,8 @@ alias venv='python -m venv'
 alias pip='python -m pip'
 alias hg='kitten hyperlinked-grep'
 alias ls="ls --color"
+alias gemini='/google/bin/releases/gemini-cli/tools/gemini'
+alias bugged='/google/bin/releases/bugged/bugged'
 # `agy` is a symlink in ~/.local/bin -> jetski-cli (herdr detects agents by the
 # process name "agy", so do NOT alias it to /usr/local/bin/jetski).
 #
@@ -547,12 +549,12 @@ export NVM_DIR="$HOME/.nvm"
 # if [ -f '/Users/jedo/tools/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/jedo/tools/google-cloud-sdk/completion.zsh.inc'; fi
 
 # Added by Jetski
-export PATH="/Users/jedo/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 
 # Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/jedo/.lmstudio/bin"
+export PATH="$PATH:$HOME/.lmstudio/bin"
 # End of LM Studio CLI section
 
 
 # Added by the Hunk installer (https://hunk.dev)
-export PATH='/Users/jedo/.hunk/bin':"$PATH"
+export PATH="$HOME/.hunk/bin:$PATH"

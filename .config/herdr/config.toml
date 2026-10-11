@@ -62,6 +62,6 @@ previous_agent = "prefix+["
 [[keys.command]]
 key = "prefix+b"
 type = "shell"
-command = "/Users/jedo/.local/bin/herdr pane move $(/Users/jedo/.local/bin/herdr pane current | python3 -c 'import sys,json; print(json.load(sys.stdin)[\"result\"][\"pane\"][\"pane_id\"])') --new-tab --focus"
+command = "$HOME/.local/bin/herdr pane move $($HOME/.local/bin/herdr pane current | python3 -c 'import sys,json; print(json.load(sys.stdin)[\"result\"][\"pane\"][\"pane_id\"])') --new-tab --focus"
 
 
