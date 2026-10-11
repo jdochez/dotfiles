@@ -12,7 +12,7 @@ else
   alias sudo='env -u TERMINFO sudo'
 
 fi
-export PATH=$HOME/bin:$JAVA_HOME/bin:$PATH:/opt/homebrew/bin:$HOME/.cargo/bin:$HOME/tools/cli/diff-so-fancy
+export PATH=$HOME/bin:$JAVA_HOME/bin:/opt/homebrew/bin:$PATH:$HOME/.cargo/bin:$HOME/tools/cli/diff-so-fancy
 
 # PATH to site functions
 export FPATH=$FPATH:/opt/homebrew/share/zsh/site-functions
@@ -153,7 +153,8 @@ alias venv='python -m venv'
 alias pip='python -m pip'
 alias hg='kitten hyperlinked-grep'
 alias ls="ls --color"
-
+# `agy` is a symlink in ~/.local/bin -> jetski-cli (herdr detects agents by the
+# process name "agy", so do NOT alias it to /usr/local/bin/jetski).
 #
 # key bindings
 #
@@ -355,6 +356,35 @@ function aswb() {
   bazel run //tools/vendor/google/aswb  
 }
 
+function aslight() { 
+  bazel run //tools/adt/idea/studio:android-studio-with-optional-plugins
+}
+
+function buildLight() {
+  bazel run //tools/vendor/google/lume/dist:install -- --android_home=$ANDROID_HOME --overwrite
+}
+
+function runLight() {
+  ANDROID_CLI_BUILD=1 $STUDIO_MAIN/bazel-bin/tools/vendor/google/android/android-cli build $*
+}
+
+function studio() {
+  bazel run //tools/adt/idea/studio:android-studio
+}
+
+# 
+# AndroidX functions
+# 
+
+function runGradleForAndroidX() {
+    CUSTOM_REPO=\$SRC/out/repo \
+    GRADLE_PLUGIN_VERSION=9.0.0-dev \
+    GRADLE_PLUGIN_REPO=$SRC/out/repo:$SRC/prebuilts/tools/common/m2/repository  \
+    JAVA_TOOLS_JAR=$SRC/prebuilts/studio/jdk/mac/Contents/Home/lib/tools.jar \
+    $SRC/tools/gradlew --parallel ${@}
+}
+alias gwx=runGradleForAndroidX
+
 #
 # G E N E R A L functions
 #
@@ -374,24 +404,30 @@ popd
 }
 
 function ws {
-if [ $# -eq 0 ]
-  then
-workspace="studio-main"
-else
-workspace=$1
-fi
-cd $HOME/src/$workspace/tools/base
-export WORKSPACE_LOCATION=$HOME/src/$workspace
-export CUSTOM_REPO=$HOME/src/$workspace/out/repo:$HOME/src/$workspace/prebuilts/tools/common/m2/repository
-export STUDIO_CUSTOM_REPO=$HOME/src/$workspace/out/repo
-export ANDROID_HOME=$WORKSPACE_LOCATION/prebuilts/studio/sdk/$OS_NAME
-export ANDROID_NDK_HOME=$ANDROID_HOME/ndk-bundle
-echo "CUSTOM_REPO and STUDIO_CUSTOM_REPO set to $CUSTOM_REPO"
-rm ~/bin/bazel
-ln -s $HOME/src/$workspace/tools/base/bazel/bazel ~/bin/bazel
-rm ~/bin/adb
-ln -s $HOME/src/$workspace/prebuilts/studio/sdk/$OS_NAME/platform-tools/adb ~/bin/adb
-chmod a+x ~/bin/bazel
+  if [ $# -eq 0 ]
+    then
+      workspace="studio-main"
+    else
+      workspace=$1
+    fi
+    cd $HOME/src/$workspace/tools/base
+    export WORKSPACE_LOCATION=$HOME/src/$workspace
+    export STUDIO_MAIN=$WORKSPACE_LOCATION
+    export CUSTOM_REPO=$HOME/src/$workspace/out/repo:$HOME/src/$workspace/prebuilts/tools/common/m2/repository
+    export STUDIO_CUSTOM_REPO=$HOME/src/$workspace/out/repo
+    export ANDROID_HOME=$WORKSPACE_LOCATION/prebuilts/studio/sdk/$OS_NAME
+    export ANDROID_NDK_HOME=$ANDROID_HOME/ndk-bundle
+    echo "CUSTOM_REPO and STUDIO_CUSTOM_REPO set to $CUSTOM_REPO"
+    rm ~/bin/bazel
+    ln -s $HOME/src/$workspace/tools/base/bazel/bazel ~/bin/bazel
+    rm ~/bin/adb
+    ln -s $HOME/src/$workspace/prebuilts/studio/sdk/$OS_NAME/platform-tools/adb ~/bin/adb
+    chmod a+x ~/bin/bazel
+}
+
+function run_studio { 
+  ws
+  bazel run //tools/vendor/google/aswb
 }
 
 function create_branch {
@@ -477,15 +513,46 @@ function recipeconverter {
   popd -q
 }
 
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/jedo/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/jedo/Downloads/google-cloud-sdk/path.zsh.inc'; fi
+# A function to make any text you give it blink
+blink() {
+    echo -e "\e[5m$1\e[0m"
+}
 
-# The next line enables shell command completion for gcloud.
-if [ -f '/Users/jedo/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/jedo/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
-
+# 
+# A I Related functions
+#
 function restart_agent() {
    ssh-agent -k
    mkdir -p ${SSH_AUTH_SOCK%/*}
    eval $(ssh-agent -a "${SSH_AUTH_SOCK}")
 }
 
+export GOOGLE_APPLICATION_CREDENTIALS=$HOME/.config/gcloud/application_default_credentials.json
+export USE_ANDROIDX_REMOTE_BUILD_CACHE=gcp
+
+# Source personal secrets, if the file exists
+if [ -f ~/.secrets.txt ]; then
+  echo "Secrets loaded"
+  source ~/.secrets.txt
+fi
+
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+
+# The next line updates PATH for the Google Cloud SDK.
+# if [ -f '/Users/jedo/tools/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/jedo/tools/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+# if [ -f '/Users/jedo/tools/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/jedo/tools/google-cloud-sdk/completion.zsh.inc'; fi
+
+# Added by Jetski
+export PATH="/Users/jedo/.local/bin:$PATH"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/jedo/.lmstudio/bin"
+# End of LM Studio CLI section
+
+
+# Added by the Hunk installer (https://hunk.dev)
+export PATH='/Users/jedo/.hunk/bin':"$PATH"
