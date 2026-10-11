@@ -1,0 +1,67 @@
+onboarding = false
+
+[theme]
+name = "nord"
+auto_switch = false
+
+# High-contrast, distinctive status colors for Agent states:
+# - Working / Running: Electric Cyan (#00e5ff) / Bright Amber (#ffb86c)
+# - Needs Input (Blocked): Vivid Coral Red (#ff5555)
+# - Completed / Ready (Done / Idle): Crisp Emerald Green (#50fa7b)
+[theme.custom]
+accent = "#00e5ff"
+blue = "#00e5ff"
+teal = "#00e5ff"
+yellow = "#ffb86c"
+red = "#ff5555"
+green = "#50fa7b"
+
+[ui]
+status_indicators = "dots"
+agent_panel_sort = "spaces"
+show_agent_labels_on_pane_borders = false
+
+[ui.sidebar.agents]
+row_gap = 1
+rows = [
+  ["state_icon", { token = "state_text", bold = true }],
+  [{ token = "workspace", bold = true }, "tab", "agent"],
+]
+
+[ui.sidebar.spaces]
+row_gap = 0
+rows = [["state_icon", "state_text", "workspace"], ["branch", "git_status"]]
+
+[ui.toast]
+delivery = "off"
+delay_seconds = 0
+
+[ui.toast.herdr]
+position = "bottom-right"
+
+[ui.sound]
+enabled = true
+done_path = "sounds/agent_done.mp3"
+request_path = "sounds/needs_input_ring.mp3"
+
+[keys]
+prefix = "ctrl+a"
+new_tab = ["prefix+c", "cmd+t"]
+close_tab = ["prefix+shift+x", "cmd+w"]
+goto = ["prefix+g", "cmd+k"]
+previous_tab = ["prefix+p", "cmd+left"]
+next_tab = ["prefix+n", "cmd+right"]
+previous_workspace = "cmd+up"
+next_workspace = "cmd+down"
+cycle_pane_next = ["prefix+tab", "alt+up"]
+cycle_pane_previous = ["prefix+shift+tab", "alt+down"]
+focus_agent = "prefix+alt+1..9"
+next_agent = "prefix+]"
+previous_agent = "prefix+["
+
+[[keys.command]]
+key = "prefix+b"
+type = "shell"
+command = "/Users/jedo/.local/bin/herdr pane move $(/Users/jedo/.local/bin/herdr pane current | python3 -c 'import sys,json; print(json.load(sys.stdin)[\"result\"][\"pane\"][\"pane_id\"])') --new-tab --focus"
+
+
